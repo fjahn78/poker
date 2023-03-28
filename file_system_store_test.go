@@ -58,7 +58,7 @@ func createTempFile(t testing.TB, initialData string) (io.ReadWriteSeeker, func(
 
   _, err = tmpfile.Write([]byte(initialData))
 	if err != nil {
-		t.Fatalf("could not write to temp file: %s", err)
+		t.Fatalf("could not write to temp file: %v", err)
 	}
 
   removeFile := func() {
