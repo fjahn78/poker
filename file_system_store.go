@@ -11,6 +11,17 @@ type FileSystemPlayerStore struct {
 	league   League
 }
 
+func NewFileSystemPlayerStore(database io.ReadWriteSeeker) *FileSystemPlayerStore {
+	if _, err := database.Seek(0, 0); err != nil {
+		log.Fatal(err)
+	}
+	league, _ := NewLeague(database)
+	return &FileSystemPlayerStore{
+		database: database,
+		league:   league,
+	}
+}
+
 func (f *FileSystemPlayerStore) GetLeague() League {
 	_, err := f.database.Seek(0, 0)
 	if err != nil {
@@ -49,16 +60,5 @@ func (f *FileSystemPlayerStore) RecordWin(name string) {
 	err = json.NewEncoder(f.database).Encode(f.league)
 	if err != nil {
 		log.Fatal(err)
-	}
-}
-
-func NewFileSystemPlayerStore(database io.ReadWriteSeeker) *FileSystemPlayerStore {
-	if _, err := database.Seek(0, 0); err != nil {
-		log.Fatal(err)
-	}
-	league, _ := NewLeague(database)
-	return &FileSystemPlayerStore{
-		database: database,
-		league:   league,
 	}
 }
