@@ -7,7 +7,7 @@ import (
 )
 
 func assertScoreEquals(t *testing.T, got int, want int) {
-  t.Helper()
+	t.Helper()
 	if got != want {
 		t.Errorf("got %d, want %d", got, want)
 	}

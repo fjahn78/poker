@@ -12,7 +12,7 @@ func TestFileSystemStore(t *testing.T) {
       {"Name": "Chleo", "Wins": 10},
       {"Name": "Chris", "Wins": 33}
     ]`)
-    defer cleanDatabase()
+		defer cleanDatabase()
 
 		store := FileSystemPlayerStore{database}
 
@@ -36,7 +36,7 @@ func TestFileSystemStore(t *testing.T) {
       {"Name": "Chleo", "Wins": 10},
       {"Name": "Chris", "Wins": 33}
     ]`)
-    defer cleanDatabase()
+		defer cleanDatabase()
 
 		store := FileSystemPlayerStore{database}
 
@@ -45,25 +45,40 @@ func TestFileSystemStore(t *testing.T) {
 
 		assertScoreEquals(t, got, want)
 	})
+	t.Run("store wins for existing players", func(t *testing.T) {
+		database, cleanDatabase := createTempFile(t, `[
+      {"Name": "Chleo", "Wins": 10},
+      {"Name": "Chris", "Wins": 33}
+    ]`)
+		defer cleanDatabase()
+
+		store := FileSystemPlayerStore{database}
+
+		store.RecordWin("Chris")
+
+		got := store.GetPlayerScore("Chris")
+		want := 34
+		assertScoreEquals(t, got, want)
+	})
 }
 
 func createTempFile(t testing.TB, initialData string) (io.ReadWriteSeeker, func()) {
-  t.Helper()
+	t.Helper()
 
-  tmpfile, err := os.CreateTemp("","db")
+	tmpfile, err := os.CreateTemp("", "db")
 
-  if err != nil {
-    t.Fatalf("could not create temp file %v", err)
-  }
+	if err != nil {
+		t.Fatalf("could not create temp file %v", err)
+	}
 
-  _, err = tmpfile.Write([]byte(initialData))
+	_, err = tmpfile.Write([]byte(initialData))
 	if err != nil {
 		t.Fatalf("could not write to temp file: %v", err)
 	}
 
-  removeFile := func() {
-    tmpfile.Close()
-    os.Remove(tmpfile.Name())
-  }
-  return tmpfile, removeFile
+	removeFile := func() {
+		tmpfile.Close()
+		os.Remove(tmpfile.Name())
+	}
+	return tmpfile, removeFile
 }
