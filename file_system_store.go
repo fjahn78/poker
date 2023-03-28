@@ -23,13 +23,7 @@ func NewFileSystemPlayerStore(database io.ReadWriteSeeker) *FileSystemPlayerStor
 }
 
 func (f *FileSystemPlayerStore) GetLeague() League {
-	_, err := f.database.Seek(0, 0)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	league, _ := NewLeague(f.database)
-	return league
+	return f.league
 }
 
 func (f *FileSystemPlayerStore) GetPlayerScore(name string) int {
