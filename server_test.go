@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 )
 
@@ -37,21 +36,6 @@ func newWinPostRequest(name string) *http.Request {
 func newGetScoreRequest(name string) *http.Request {
 	req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/players/%s", name), nil)
 	return req
-}
-
-func assertStatus(t *testing.T, got, want int) {
-	t.Helper()
-	if got != want {
-		t.Errorf("got status %d, want %d", got, want)
-	}
-}
-
-func assertResponseBody(t *testing.T, got, want string) {
-	t.Helper()
-
-	if got != want {
-		t.Errorf("response body is wrong, got %q want %q", got, want)
-	}
 }
 
 func TestGETPlayers(t *testing.T) {
@@ -156,13 +140,6 @@ func TestLeague(t *testing.T) {
 	})
 }
 
-func assertContentType(t testing.TB, response *httptest.ResponseRecorder, want string) {
-	t.Helper()
-	if response.Result().Header.Get("content-type") != "application/json" {
-		t.Errorf("response did not have content of %s, got %v", want, response.Result().Header)
-	}
-}
-
 func getLeagueFromResponse(t testing.TB, body io.Reader) (league []Player) {
 	t.Helper()
 	err := json.NewDecoder(body).Decode(&league)
@@ -172,14 +149,6 @@ func getLeagueFromResponse(t testing.TB, body io.Reader) (league []Player) {
 	}
 	return
 }
-
-func assertLeague(t testing.TB, got, wantedLeague []Player) {
-	t.Helper()
-	if !reflect.DeepEqual(got, wantedLeague) {
-		t.Errorf("got %v, want %v", got, wantedLeague)
-	}
-}
-
 func newLeagueRequest() *http.Request {
 	req, _ := http.NewRequest(http.MethodGet, "/league", nil)
 	return req
