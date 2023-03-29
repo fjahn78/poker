@@ -6,6 +6,13 @@ import (
 	"testing"
 )
 
+func assertNoError(t testing.TB, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatalf("didn't expect an error but got one, %v", err)
+	}
+}
+
 func assertScoreEquals(t *testing.T, got int, want int) {
 	t.Helper()
 	if got != want {
