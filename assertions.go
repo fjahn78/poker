@@ -1,9 +1,10 @@
-package main
+package poker_test
 
 import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
+	"poker"
 )
 
 func assertNoError(t testing.TB, err error) {

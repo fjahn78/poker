@@ -1,4 +1,4 @@
-package main
+package poker_test
 
 import (
 	"io"
@@ -11,7 +11,6 @@ func TestTape_Write(t *testing.T) {
 
 	tape := &tape{file: file}
 
-	// trunk-ignore(golangci-lint/errcheck)
 	tape.Write([]byte("ABC"))
 
 	if _, err := file.Seek(0, 0); err != nil {
