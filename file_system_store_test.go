@@ -6,27 +6,31 @@ import (
 )
 
 func TestFileSystemStore(t *testing.T) {
-	t.Run("league from file", func(t *testing.T) {
+	t.Run("league sorted from file", func(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, `[
       {"Name": "Chleo", "Wins": 10},
       {"Name": "Chris", "Wins": 33}
     ]`)
 		defer cleanDatabase()
 
-		store, _ := NewFileSystemPlayerStore(database)
+		store, err := NewFileSystemPlayerStore(database)
+
+		assertNoError(t, err)
 
 		got := store.GetLeague()
 		want := []Player{
 			{
-				Name: "Chleo",
-				Wins: 10,
-			},
-			{
 				Name: "Chris",
 				Wins: 33,
 			},
+			{
+				Name: "Chleo",
+				Wins: 10,
+			},
 		}
 		assertLeague(t, got, want)
+
+		//* read again
 		got = store.GetLeague()
 		assertLeague(t, got, want)
 	})
