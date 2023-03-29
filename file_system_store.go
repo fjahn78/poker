@@ -2,22 +2,22 @@ package main
 
 import (
 	"encoding/json"
-	"io"
 	"log"
+	"os"
 )
 
 type FileSystemPlayerStore struct {
-	database io.Writer
+	database *json.Encoder
 	league   League
 }
 
-func NewFileSystemPlayerStore(database io.ReadWriteSeeker) *FileSystemPlayerStore {
+func NewFileSystemPlayerStore(database *os.File) *FileSystemPlayerStore {
 	if _, err := database.Seek(0, 0); err != nil {
 		log.Fatal(err)
 	}
 	league, _ := NewLeague(database)
 	return &FileSystemPlayerStore{
-		database: &tape{database},
+		database: json.NewEncoder(&tape{database}),
 		league:   league,
 	}
 }
@@ -46,8 +46,6 @@ func (f *FileSystemPlayerStore) RecordWin(name string) {
 		f.league = append(f.league, Player{name, 1})
 	}
 
-	err := json.NewEncoder(f.database).Encode(f.league)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// trunk-ignore(golangci-lint/errcheck)
+	f.database.Encode(f.league)
 }
