@@ -97,12 +97,7 @@ func TestStoreWins(t *testing.T) {
 
 		assertStatus(t, response.Code, http.StatusAccepted)
 
-		if len(store.winCalls) != 1 {
-			t.Errorf("got %d calls to RecordWin, want %d", len(store.winCalls), 1)
-		}
-		if store.winCalls[0] != player {
-			t.Errorf("did not store correct winner. Got %q, want %q", store.winCalls[0], player)
-		}
+		assertPlayerWin(t, &store, "Pepper")
 	})
 }
 
@@ -152,4 +147,18 @@ func getLeagueFromResponse(t testing.TB, body io.Reader) (league League) {
 func newLeagueRequest() *http.Request {
 	req, _ := http.NewRequest(http.MethodGet, "/league", nil)
 	return req
+}
+
+func assertPlayerWin(t testing.TB, store *StubPlayerStore, winner string) {
+	t.Helper()
+	if len(store.winCalls) != 1 {
+		t.Fatal("expected a win call but didn't get any")
+	}
+
+	got := store.winCalls[0]
+	want := winner
+
+	if got != want {
+		t.Errorf("didn't record correct winner, got %q, want %q", got, want)
+	}
 }
