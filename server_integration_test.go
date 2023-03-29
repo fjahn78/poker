@@ -9,8 +9,7 @@ import (
 func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 	database, cleanDB := createTempFile(t, `[]`)
 	defer cleanDB()
-	store, err := NewFileSystemPlayerStore(database)
-	assertNoError(t, err)
+	store, _ := NewFileSystemPlayerStore(database)
 	server := NewPlayerServer(store)
 	player := "Pepper"
 
