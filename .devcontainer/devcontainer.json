@@ -35,7 +35,8 @@
         "threecomma.vscode-readme",
         "sleistner.vscode-fileutils",
         "dkundel.vscode-new-file",
-        "rangav.vscode-thunder-client"
+        "rangav.vscode-thunder-client",
+        "redhat.vscode-yaml"
       ],
       "settings": {
         "dev.containers.copyGitConfig": true,
