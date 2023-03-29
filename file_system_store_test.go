@@ -1,9 +1,8 @@
-package poker_test
+package poker
 
 import (
 	"os"
 	"testing"
-	"github.com/fjahn78/http-server/poker"
 )
 
 func TestFileSystemStore(t *testing.T) {

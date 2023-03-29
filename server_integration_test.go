@@ -1,4 +1,4 @@
-package poker_test
+package poker
 
 import (
 	"net/http"

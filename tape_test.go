@@ -1,4 +1,4 @@
-package poker_test
+package poker
 
 import (
 	"io"
@@ -11,7 +11,7 @@ func TestTape_Write(t *testing.T) {
 
 	tape := &tape{file: file}
 
-	tape.Write([]byte("ABC"))
+	_, _ = tape.Write([]byte("ABC"))
 
 	if _, err := file.Seek(0, 0); err != nil {
 		t.Fatal(err)
