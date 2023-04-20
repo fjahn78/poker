@@ -7,9 +7,9 @@ import (
 	"time"
 )
 
-type BlindAlerter interface {
-	ScheduleAlertAt(duration time.Duration, amount int)
-}
+const (
+	blindTimeIncrement = 10 * time.Minute
+)
 
 type CLI struct {
 	playerStore PlayerStore
@@ -42,7 +42,7 @@ func (cli *CLI) scheduleBlindAlerts() {
 
 	for _, blind := range blinds {
 		cli.alerter.ScheduleAlertAt(blindTime, blind)
-		blindTime += 10 * time.Minute
+		blindTime += blindTimeIncrement
 	}
 }
 
