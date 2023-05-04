@@ -1,3 +1,3 @@
-module github.com/fjahn78/http-server
+module github.com/fjahn78/poker
 
-go 1.20
+go 1.18
