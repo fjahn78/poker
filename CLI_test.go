@@ -29,8 +29,8 @@ func (s *SpyBlindAlerter) ScheduleAlertAt(at time.Duration, amount int) {
 }
 
 var (
-	dummyPlayerStore  = &poker.StubPlayerStore{}
-	dummyStdOut       = &bytes.Buffer{}
+	dummyPlayerStore = &poker.StubPlayerStore{}
+	dummyStdOut      = &bytes.Buffer{}
 )
 
 func TestCLI(t *testing.T) {
@@ -111,6 +111,8 @@ func TestCLI(t *testing.T) {
 				if len(blindAlerter.alerts) <= i {
 					t.Fatalf("alert %d was not scheduled %v", i, blindAlerter.alerts)
 				}
+				got := blindAlerter.alerts[i]
+				assertScheduledAlert(t, got, want)
 			})
 		}
 	})
