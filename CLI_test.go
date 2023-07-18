@@ -41,12 +41,7 @@ func TestCLI(t *testing.T) {
 		cli := poker.NewCLI(in, stdout, game)
 		cli.PlayPoker()
 
-		gotPrompt := stdout.String()
-		wantPrompt := poker.PlayerPrompt
-
-		if gotPrompt != wantPrompt {
-			t.Errorf("got %q, want %q", gotPrompt, wantPrompt)
-		}
+		assertMessagesSentToUser(t, stdout, poker.PlayerPrompt)
 
 		if game.StartedWith != 7 {
 			t.Errorf("wanted Start called with 7 but got %d", game.StartedWith)
@@ -61,15 +56,32 @@ func TestCLI(t *testing.T) {
 		cli := poker.NewCLI(in, stdout, game)
 		cli.PlayPoker()
 
-		if game.StartCalled {
-			t.Errorf("game should not have started")
-		}
+		wantPrompt := poker.PlayerPrompt + poker.BadPlayerInputErrMsg
+
+		assertMessagesSentToUser(t, stdout, wantPrompt)
+		assertGameNotStarted(game, t)
 	})
+}
+
+func assertGameNotStarted(game *GameSpy, t testing.TB) {
+	t.Helper()
+	if game.StartCalled {
+		t.Errorf("game should not have started")
+	}
 }
 
 func assertScheduledAlert(t testing.TB, got, want poker.ScheduledAlert) {
 	t.Helper()
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got amount %q, want %q", got, want)
+	}
+}
+
+func assertMessagesSentToUser(t testing.TB, stdout *bytes.Buffer, messages ...string) {
+	t.Helper()
+	want := strings.Join(messages, "")
+	got := stdout.String()
+	if got != want {
+		t.Errorf("got %q sent to stdout but expected %+v", got, messages)
 	}
 }
