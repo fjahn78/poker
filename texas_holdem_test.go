@@ -8,6 +8,21 @@ import (
 	"github.com/fjahn78/poker"
 )
 
+type GameSpy struct {
+	StartedWith  int
+	FinishedWith string
+	StartCalled  bool
+}
+
+func (g *GameSpy) Start(numberOfPlayers int) {
+	g.StartCalled = true
+	g.StartedWith = numberOfPlayers
+}
+
+func (g *GameSpy) Finish(winner string) {
+	g.FinishedWith = winner
+}
+
 func TestGame_Start(t *testing.T) {
 	t.Run("schedules alerts on game start for 5 players", func(t *testing.T) {
 		blindAlerter := &poker.SpyBlindAlerter{}
@@ -44,7 +59,7 @@ func TestGame_Start(t *testing.T) {
 			{At: 24 * time.Minute, Amount: 300},
 			{At: 36 * time.Minute, Amount: 400},
 		}
-		
+
 		checkSchedulingCases(cases, t, blindAlerter)
 	})
 }
@@ -60,13 +75,13 @@ func TestGame_Finish(t *testing.T) {
 
 func checkSchedulingCases(cases []poker.ScheduledAlert, t *testing.T, blindAlerter *poker.SpyBlindAlerter) {
 	for i, want := range cases {
-			t.Run(fmt.Sprint(want), func(t *testing.T) {
-				if len(blindAlerter.Alerts) <= i {
-					t.Fatalf("alert %d was not scheduled %v", i, blindAlerter.Alerts)
-				}
+		t.Run(fmt.Sprint(want), func(t *testing.T) {
+			if len(blindAlerter.Alerts) <= i {
+				t.Fatalf("alert %d was not scheduled %v", i, blindAlerter.Alerts)
+			}
 
-				got := blindAlerter.Alerts[i]
-				assertScheduledAlert(t, got, want)
-			})
-		}
+			got := blindAlerter.Alerts[i]
+			assertScheduledAlert(t, got, want)
+		})
+	}
 }
