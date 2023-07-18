@@ -8,7 +8,9 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
+	"time"
 )
+
 
 type StubPlayerStore struct {
 	scores   map[string]int
@@ -108,4 +110,21 @@ func AssertPlayerWin(t testing.TB, store *StubPlayerStore, winner string) {
 	if got != want {
 		t.Errorf("didn't record correct winner, got %q, want %q", got, want)
 	}
+}
+
+type ScheduledAlert struct {
+	At     time.Duration
+	Amount int
+}
+
+type SpyBlindAlerter struct {
+	Alerts []ScheduledAlert
+}
+
+func (s ScheduledAlert) String() string {
+	return fmt.Sprintf("%d chips at %v", s.Amount, s.At)
+}
+
+func (s *SpyBlindAlerter) ScheduleAlertAt(at time.Duration, amount int) {
+	s.Alerts = append(s.Alerts, ScheduledAlert{at, amount})
 }
