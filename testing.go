@@ -77,10 +77,10 @@ func AssertResponseBody(t *testing.T, got, want string) {
 	}
 }
 
-func AssertStatus(t *testing.T, got, want int) {
+func AssertStatus(t *testing.T, got *httptest.ResponseRecorder, want int) {
 	t.Helper()
-	if got != want {
-		t.Errorf("got status %d, want %d", got, want)
+	if got.Code != want {
+		t.Errorf("got status %d, want %d", got.Code, want)
 	}
 }
 

@@ -22,7 +22,7 @@ func TestGETPlayers(t *testing.T) {
 
 		server.ServeHTTP(response, request)
 
-		AssertStatus(t, response.Code, http.StatusOK)
+		AssertStatus(t, response, http.StatusOK)
 		AssertResponseBody(t, response.Body.String(), want)
 	})
 	t.Run("returns Floyd's score", func(t *testing.T) {
@@ -33,7 +33,7 @@ func TestGETPlayers(t *testing.T) {
 
 		server.ServeHTTP(response, request)
 
-		AssertStatus(t, response.Code, http.StatusOK)
+		AssertStatus(t, response, http.StatusOK)
 		AssertResponseBody(t, response.Body.String(), want)
 	})
 	t.Run("return 404 for a non existent player", func(t *testing.T) {
@@ -42,7 +42,7 @@ func TestGETPlayers(t *testing.T) {
 
 		server.ServeHTTP(response, request)
 
-		got := response.Code
+		got := response
 		want := http.StatusNotFound
 
 		AssertStatus(t, got, want)
@@ -63,7 +63,7 @@ func TestStoreWins(t *testing.T) {
 
 		server.ServeHTTP(response, request)
 
-		AssertStatus(t, response.Code, http.StatusAccepted)
+		AssertStatus(t, response, http.StatusAccepted)
 
 		AssertPlayerWin(t, &store, "Pepper")
 	})
@@ -97,7 +97,7 @@ func TestLeague(t *testing.T) {
 
 		got := GetLeagueFromResponse(t, response.Body)
 
-		AssertStatus(t, response.Code, http.StatusOK)
+		AssertStatus(t, response, http.StatusOK)
 		AssertLeague(t, got, wantedLeague)
 		AssertContentType(t, response, jsonContentType)
 	})
@@ -106,11 +106,16 @@ func TestGame(t *testing.T) {
 	t.Run("GET /game returns 200", func(t *testing.T) {
 		server := NewPlayerServer(&StubPlayerStore{})
 
-		request, _ := http.NewRequest(http.MethodGet, "/game", nil)
+		request := newGameRequest()
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
 
-		AssertStatus(t, response.Code, http.StatusOK)
+		AssertStatus(t, response, http.StatusOK)
 	})
+}
+
+func newGameRequest() *http.Request {
+	request, _ := http.NewRequest(http.MethodGet, "/game", nil)
+	return request
 }
