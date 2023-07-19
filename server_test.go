@@ -135,7 +135,7 @@ func TestGame(t *testing.T) {
 	})
 }
 
-func writeWSMessage(t *testing.T, ws *websocket.Conn, winner string ) {
+func writeWSMessage(t *testing.T, ws *websocket.Conn, winner string) {
 	t.Helper()
 	if err := ws.WriteMessage(websocket.TextMessage, []byte(winner)); err != nil {
 		t.Fatalf("could not send message over ws connection %v", err)
