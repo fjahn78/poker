@@ -29,7 +29,7 @@ type PlayerServer struct {
 	store PlayerStore
 	http.Handler
 	template *template.Template
-	game Game
+	game     Game
 }
 
 const htmlTemplatePath = "game.html"

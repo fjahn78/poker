@@ -10,6 +10,7 @@ import (
 	poker "github.com/fjahn78/poker"
 	"github.com/gorilla/websocket"
 )
+
 var (
 	dummyGame = &GameSpy{}
 )

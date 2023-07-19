@@ -11,7 +11,6 @@ import (
 	"time"
 )
 
-
 type StubPlayerStore struct {
 	Scores   map[string]int
 	WinCalls []string
