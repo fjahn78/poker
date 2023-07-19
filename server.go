@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/websocket"
@@ -70,8 +72,13 @@ func (p *PlayerServer) webSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, winnerMsg, _ := conn.ReadMessage()
-	p.store.RecordWin(string(winnerMsg))
+	_, numberOfPlayerMsg, _ := conn.ReadMessage()
+	numberOfPlayers, _ := strconv.Atoi(string(numberOfPlayerMsg))
+	//TODO: Don't discard the blinds messages!
+	p.game.Start(numberOfPlayers, io.Discard)
+
+	_, winner, _ := conn.ReadMessage()
+	p.game.Finish(string(winner))
 }
 
 func (p *PlayerServer) playGame(w http.ResponseWriter, r *http.Request) {
