@@ -92,7 +92,7 @@ func assertGameStartedWith(t *testing.T, game *GameSpy, numberOfPlayersWanted in
 func assertFinishCalledWith(t *testing.T, game *GameSpy, winner string) {
 	t.Helper()
 	if game.FinishCalledWith != winner {
-		t.Errorf("expected finish called with '%q' but got %q", winner, game.FinishCalledWith)
+		t.Errorf("expected finish called with %q but got %q", winner, game.FinishCalledWith)
 	}
 }
 
