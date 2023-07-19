@@ -50,12 +50,15 @@ func (p *PlayerServer) websocket(w http.ResponseWriter, r *http.Request)  {
 		ReadBufferSize:   1024,
 		WriteBufferSize:  0,
 		}
-	_, err := upgrader.Upgrade(w, r, nil)
+	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("problem upgrading websocket %s", err.Error()), http.StatusInternalServerError)
 
 		return
 	}
+
+	_, winnerMsg, _ := conn.ReadMessage()
+	p.store.RecordWin(string(winnerMsg))
 }
 
 func (p *PlayerServer) game(w http.ResponseWriter, r *http.Request) {
