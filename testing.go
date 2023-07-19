@@ -13,22 +13,22 @@ import (
 
 
 type StubPlayerStore struct {
-	scores   map[string]int
-	winCalls []string
-	league   League
+	Scores   map[string]int
+	WinCalls []string
+	League   League
 }
 
 func (s *StubPlayerStore) GetPlayerScore(name string) int {
-	score := s.scores[name]
+	score := s.Scores[name]
 	return score
 }
 
 func (s *StubPlayerStore) RecordWin(name string) {
-	s.winCalls = append(s.winCalls, name)
+	s.WinCalls = append(s.WinCalls, name)
 }
 
 func (s *StubPlayerStore) GetLeague() League {
-	return s.league
+	return s.League
 }
 
 func NewWinPostRequest(name string) *http.Request {
@@ -100,11 +100,11 @@ func NewLeagueRequest() *http.Request {
 
 func AssertPlayerWin(t testing.TB, store *StubPlayerStore, winner string) {
 	t.Helper()
-	if len(store.winCalls) != 1 {
+	if len(store.WinCalls) != 1 {
 		t.Fatal("expected a win call but didn't get any")
 	}
 
-	got := store.winCalls[0]
+	got := store.WinCalls[0]
 	want := winner
 
 	if got != want {
