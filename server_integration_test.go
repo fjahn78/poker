@@ -10,7 +10,7 @@ func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 	database, cleanDB := createTempFile(t, `[]`)
 	defer cleanDB()
 	store, _ := NewFileSystemPlayerStore(database)
-	server := NewPlayerServer(store)
+	server := mustMakePlayerServer(t, store)
 	player := "Pepper"
 
 	server.ServeHTTP(httptest.NewRecorder(), NewWinPostRequest(player))

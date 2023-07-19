@@ -26,11 +26,21 @@ type PlayerStore interface {
 type PlayerServer struct {
 	store PlayerStore
 	http.Handler
+	template *template.Template
 }
 
-func NewPlayerServer(store PlayerStore) *PlayerServer {
+const htmlTemplatePath = "game.html"
+
+func NewPlayerServer(store PlayerStore) (*PlayerServer, error) {
 	p := new(PlayerServer)
 
+	tmpl, err := template.ParseFiles(htmlTemplatePath)
+
+	if err != nil {
+		return nil, fmt.Errorf("problem opening %s %v", htmlTemplatePath, err)
+	}
+
+	p.template = tmpl
 	p.store = store
 
 	router := http.NewServeMux()
@@ -38,19 +48,20 @@ func NewPlayerServer(store PlayerStore) *PlayerServer {
 	router.Handle("/league", http.HandlerFunc(p.leagueHandler))
 	router.Handle("/players/", http.HandlerFunc(p.playersHandler))
 	router.Handle("/game", http.HandlerFunc(p.game))
-	router.Handle("/ws", http.HandlerFunc(p.websocket))
+	router.Handle("/ws", http.HandlerFunc(p.webSocket))
 
 	p.Handler = router
 
-	return p
+	return p, nil
 }
 
-func (p *PlayerServer) websocket(w http.ResponseWriter, r *http.Request)  {
-	upgrader := websocket.Upgrader{
-		ReadBufferSize:   1024,
-		WriteBufferSize:  0,
-		}
-	conn, err := upgrader.Upgrade(w, r, nil)
+var wsUpgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 0,
+}
+
+func (p *PlayerServer) webSocket(w http.ResponseWriter, r *http.Request) {
+	conn, err := wsUpgrader.Upgrade(w, r, nil)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("problem upgrading websocket %s", err.Error()), http.StatusInternalServerError)
 
@@ -62,14 +73,7 @@ func (p *PlayerServer) websocket(w http.ResponseWriter, r *http.Request)  {
 }
 
 func (p *PlayerServer) game(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("game.html")
-
-	if err != nil {
-		http.Error(w, fmt.Sprintf("problem loading template %s", err.Error()), http.StatusInternalServerError)
-		return
-	}
-
-	err = tmpl.Execute(w, nil)
+	err := p.template.Execute(w, nil)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("problem executing template %s", err.Error()), http.StatusInternalServerError)
 		return
