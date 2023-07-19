@@ -2,6 +2,7 @@ package poker
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -9,8 +10,9 @@ import (
 )
 
 const (
-	PlayerPrompt = "Please enter the number of players: "
+	PlayerPrompt         = "Please enter the number of players: "
 	BadPlayerInputErrMsg = "Bad value received for number of players, please try again with a number"
+	BadWinnerInputMsg    = "invalid winner input, please enter \"PlayerName wins\""
 )
 
 type CLI struct {
@@ -46,11 +48,18 @@ func (cli *CLI) PlayPoker() {
 	cli.game.Start(numberOfPlayers)
 
 	winnerInput := cli.readline()
-	winner := extractWinner(winnerInput)
+	winner, err := extractWinner(winnerInput)
+	if err != nil {
+		fmt.Fprint(cli.out, BadWinnerInputMsg)
+		return
+	}
 
 	cli.game.Finish(winner)
 }
 
-func extractWinner(userInput string) string {
-	return strings.Replace(userInput, " wins", "", 1)
+func extractWinner(userInput string) (string, error) {
+	if !strings.Contains(userInput, " wins") {
+		return "", errors.New(BadWinnerInputMsg)
+	}
+	return strings.Replace(userInput, " wins", "", 1), nil
 }
