@@ -17,15 +17,18 @@ var (
 )
 
 type GameSpy struct {
-	StartCalled      bool
-	StartCalledWith  int
+	StartCalled     bool
+	StartCalledWith int
+	BlindAlert      []byte
+
 	FinishCalled     bool
 	FinishCalledWith string
 }
 
-func (g *GameSpy) Start(numberOfPlayers int, to io.Writer) {
+func (g *GameSpy) Start(numberOfPlayers int, out io.Writer) {
 	g.StartCalledWith = numberOfPlayers
 	g.StartCalled = true
+	_, _ = out.Write(g.BlindAlert)
 }
 
 func (g *GameSpy) Finish(winner string) {
@@ -84,14 +87,24 @@ func TestCLI(t *testing.T) {
 
 func assertGameStartedWith(t *testing.T, game *GameSpy, numberOfPlayersWanted int) {
 	t.Helper()
-	if game.StartCalledWith != numberOfPlayersWanted {
+
+	passed := retryUntil(retry, func() bool {
+		return game.StartCalledWith == numberOfPlayersWanted
+	})
+
+	if !passed {
 		t.Errorf("wanted Start called with %d but got %d", numberOfPlayersWanted, game.StartCalledWith)
 	}
 }
 
 func assertFinishCalledWith(t *testing.T, game *GameSpy, winner string) {
 	t.Helper()
-	if game.FinishCalledWith != winner {
+
+	passed := retryUntil(retry, func() bool {
+		return game.FinishCalledWith == winner
+	})
+
+	if !passed {
 		t.Errorf("expected finish called with %q but got %q", winner, game.FinishCalledWith)
 	}
 }

@@ -13,6 +13,8 @@ import (
 
 var (
 	dummyGame = &GameSpy{}
+	timeout   = 10 * time.Millisecond
+	retry     = 500 * time.Millisecond
 )
 
 func TestGETPlayers(t *testing.T) {
@@ -123,8 +125,10 @@ func TestGame(t *testing.T) {
 		poker.AssertStatus(t, response, http.StatusOK)
 	})
 	t.Run("start a game with 3 players and declare Ruth as the winner", func(t *testing.T) {
-		game := &GameSpy{}
+		wantedBlindAlert := "Blind is 100"
 		winner := "Ruth"
+
+		game := &GameSpy{BlindAlert: []byte(wantedBlindAlert)}
 		server := httptest.NewServer(mustMakePlayerServer(t, dummyPlayerStore, game))
 		ws := mustDialWS(t, "ws"+strings.TrimPrefix(server.URL, "http")+"/ws")
 
@@ -134,10 +138,47 @@ func TestGame(t *testing.T) {
 		writeWSMessage(t, ws, "3")
 		writeWSMessage(t, ws, winner)
 
-		time.Sleep(10 * time.Millisecond)
+		time.Sleep(timeout)
 		assertGameStartedWith(t, game, 3)
 		assertFinishCalledWith(t, game, winner)
+
+		within(t, timeout, func() { assertWebsocketGotMsg(t, ws, wantedBlindAlert) })
 	})
+}
+
+func assertWebsocketGotMsg(t *testing.T, ws *websocket.Conn, want string) {
+	_, msg, _ := ws.ReadMessage()
+
+	if string(msg) != want {
+		t.Errorf("got blind alert %q, want %q", string(msg), want)
+	}
+}
+
+func retryUntil(d time.Duration, f func() bool) bool {
+	deadline := time.Now().Add(d)
+	for time.Now().Before(deadline) {
+		if f() {
+			return true
+		}
+	}
+	return false
+}
+
+func within(t testing.TB, d time.Duration, assert func()) {
+	t.Helper()
+
+	done := make(chan struct{}, 1)
+
+	go func() {
+		assert()
+		done <- struct{}{}
+	}()
+
+	select {
+	case <-time.After(d):
+		t.Error("timed out")
+	case <-done:
+	}
 }
 
 func writeWSMessage(t *testing.T, ws *websocket.Conn, winner string) {
